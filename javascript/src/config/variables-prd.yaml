@@ -1,0 +1,4 @@
+DISTRIBUTION_PARAMETER_STORE=/com/ccoe/kschang/distribution
+DEBUG_PARAMETER_STORE=/com/ccoe/kschang/debug
+TARGET_BUCKET=kschang-production
+TARGET_FILENAME=kschang_production

@@ -1,0 +1,19 @@
+{
+  "name": "replaced-by-user-input",
+  "description": "replaced-by-user-input",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "aws-sdk-mock": "^4.5.0",
+    "jest": "^24.7.1"
+  },
+  "scripts": {
+    "test": "jest",
+    "locally": "export AWS_SDK_LOAD_CONFIG=true;node -e \"console.log(require('./src/index').handler(require('./events/event-s3.json')));\""
+  },
+  "dependencies": {
+    "debug": "^4.3.2",
+    "dotenv": "^10.0.0",
+    "path": "^0.12.7"
+  }
+}

@@ -1,0 +1,55 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.6'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+    id "com.palantir.docker" version "0.33.0"
+    id "com.palantir.docker-run" version "0.33.0"
+}
+
+group = 'com.kschang.rest.webservices'
+version = '0.0.2-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+String dockerHubUsernameProperty = findProperty('dockerHubUsername') ?: 'exkschang'
+String imageName = "${dockerHubUsernameProperty}/${project.name}:${project.version}"
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+docker {
+     name imageName
+	 files "$buildDir/libs/${bootJar.archiveFileName.get()}"
+     buildArgs([JAR_FILE: bootJar.archiveFileName.get()])
+	//  tag 'DockerHub', imageName
+}
+
+dockerRun {
+     name "${project.name}"
+     image imageName
+     ports '8080:8080'
+	 env 'SPRING_PROFILES_ACTIVE': 'prd'
+     clean true
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

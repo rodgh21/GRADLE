@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Inject Environment Variables
+  
+Resources:
+##################################################################
+#
+#  Lambda Function accessing SSM Parameter Store
+#
+##################################################################
+  InjectEnvVariablesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: InjectEnvVariablesFunction
+      Description: >
+        Inject Environment Variables and Configure Debug Level with Parameter Store
+      CodeUri: src/
+      Handler: index.handler
+      Role: !GetAtt InjectEnvVariablesFunctionRole.Arn
+      Runtime: nodejs16.x
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          NODE_ENV: dev
+      Timeout: 30
+  
+##################################################################
+#
+#  Lambda Function IAM Role
+#
+##################################################################
+  InjectEnvVariablesFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - 'lambda.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'InjectEnvVariablesParameterStoreParameterAccess'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ssm:GetParameter*'
+                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/com/ccoe/kschang*'
+        - PolicyName: 'InjectEnvVariablesLambdaBasicExecution'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+
+##################################################################
+#
+#  SSM Parameter Store debug level parameter
+#
+##################################################################
+  DebugLevelParameters:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/com/ccoe/kschang/debug'
+      Description: 'Configuration Values for Debug Level'
+      Type: String
+      Value: '{"level":"app:info"}'

@@ -1,0 +1,30 @@
+spring:
+   application:
+      name: kschang_local
+   datasource:
+      username: dbuser
+      password: dbpasswd
+server:
+   port: 8080
+
+---
+spring:
+   profiles: dev
+   application:
+      name: kschang_dev
+   datasource:
+      username: dbuser_dev
+      password: dbpasswd_dev
+server:
+   port: 8080
+
+---
+spring: 
+   profiles: prd
+   application:
+      name: kschang_prd
+   datasource:
+      username: dbuser_prd
+      password: dbpasswd_prd
+server: 
+   port: 8080
